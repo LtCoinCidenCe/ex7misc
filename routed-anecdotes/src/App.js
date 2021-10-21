@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Switch, Route, Link } from 'react-router-dom'
+import { Switch, Route, Link, useRouteMatch } from 'react-router-dom'
 
 const Menu = () => {
   const padding = {
@@ -7,18 +7,29 @@ const Menu = () => {
   }
   return (
     <div>
-      <Link style={padding} to="/">anecdotes</Link>
-      <Link style={padding} to="/create">create new</Link>
-      <Link style={padding} to="/about">about</Link>
+      <Link style={padding} to='/'>anecdotes</Link>
+      <Link style={padding} to='/create'>create new</Link>
+      <Link style={padding} to='/about'>about</Link>
     </div>
   )
 }
+
+const Anecdote = ({ anecdote }) => (
+  <div className="oneAncdt">
+    <h2>{anecdote.content}</h2>
+    <p>has {anecdote.votes} votes</p>
+    <p>for more information see <a href={anecdote.info}>{anecdote.info}</a></p>
+  </div>
+)
 
 const AnecdoteList = ({ anecdotes }) => (
   <div>
     <h2>Anecdotes</h2>
     <ul>
-      {anecdotes.map(anecdote => <li key={anecdote.id} >{anecdote.content}</li>)}
+      {anecdotes.map(anecdote =>
+        <li key={anecdote.id}>
+          <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
+        </li>)}
     </ul>
   </div>
 )
@@ -103,7 +114,10 @@ const App = () => {
   ])
 
   const [notification, setNotification] = useState('')
+  const match = useRouteMatch('/anecdotes/:id')
 
+  const oneAncdt = match ? anecdotes.find(ancdt => ancdt.id === match.params.id) : null
+  
   const addNew = (anecdote) => {
     anecdote.id = (Math.random() * 10000).toFixed(0)
     setAnecdotes(anecdotes.concat(anecdote))
@@ -129,11 +143,10 @@ const App = () => {
       <Menu />
 
       <Switch>
-        <Route path="/about"><About /></Route>
-        <Route path="/create"><CreateNew addNew={addNew} /></Route>
-        <Route path="/">
-          <AnecdoteList anecdotes={anecdotes} />
-        </Route>
+        <Route path='/anecdotes/:id'><Anecdote anecdote={oneAncdt} /></Route>
+        <Route path='/about'><About /></Route>
+        <Route path='/create'><CreateNew addNew={addNew} /></Route>
+        <Route path='/'><AnecdoteList anecdotes={anecdotes} /></Route>
       </Switch>
       <Footer />
 
@@ -141,4 +154,4 @@ const App = () => {
   )
 }
 
-export default App;
+export default App
