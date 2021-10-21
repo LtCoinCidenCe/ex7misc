@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { Switch, Route, Link, useRouteMatch } from 'react-router-dom'
-
+import { Switch, Route, Link, useRouteMatch, useHistory } from 'react-router-dom'
+// static view
 const Menu = () => {
   const padding = {
     paddingRight: 5
@@ -13,6 +13,10 @@ const Menu = () => {
     </div>
   )
 }
+// view with a timeout
+const Notification = ({ text }) => (
+  <p className="notification">{text}</p>
+)
 
 const Anecdote = ({ anecdote }) => (
   <div className="oneAncdt">
@@ -33,7 +37,7 @@ const AnecdoteList = ({ anecdotes }) => (
     </ul>
   </div>
 )
-
+// static view
 const About = () => (
   <div>
     <h2>About anecdote app</h2>
@@ -60,16 +64,21 @@ const CreateNew = (props) => {
   const [content, setContent] = useState('')
   const [author, setAuthor] = useState('')
   const [info, setInfo] = useState('')
-
+  const history = useHistory()
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    // should get addNew function from App
     props.addNew({
       content,
       author,
       info,
       votes: 0
     })
+    setContent('')
+    setAuthor('')
+    setInfo('')
+    history.push('/') // do redirect
   }
 
   return (
@@ -88,13 +97,15 @@ const CreateNew = (props) => {
           url for more info
           <input name='info' value={info} onChange={(e)=> setInfo(e.target.value)} />
         </div>
-        <button>create</button>
+        <button type="submit">create</button>
       </form>
     </div>
   )
-
 }
 
+// originally a state
+// this should be ok because clearTimeout does not do anything bad with invalid ID
+let timeoutID = 0
 const App = () => {
   const [anecdotes, setAnecdotes] = useState([
     {
@@ -112,15 +123,19 @@ const App = () => {
       id: '2'
     }
   ])
-
+  
   const [notification, setNotification] = useState('')
   const match = useRouteMatch('/anecdotes/:id')
 
   const oneAncdt = match ? anecdotes.find(ancdt => ancdt.id === match.params.id) : null
-  
+
   const addNew = (anecdote) => {
     anecdote.id = (Math.random() * 10000).toFixed(0)
     setAnecdotes(anecdotes.concat(anecdote))
+    // set notification here
+    clearTimeout(timeoutID)
+    setNotification(`'${anecdote.content}' created!`)
+    timeoutID = setTimeout(() => { setNotification('') }, 10000)
   }
 
   const anecdoteById = (id) =>
@@ -141,7 +156,7 @@ const App = () => {
     <div>
       <h1>Software anecdotes</h1>
       <Menu />
-
+      <Notification text={notification} />
       <Switch>
         <Route path='/anecdotes/:id'><Anecdote anecdote={oneAncdt} /></Route>
         <Route path='/about'><About /></Route>
