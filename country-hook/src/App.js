@@ -18,7 +18,40 @@ const useField = (type) => {
 const useCountry = (name) => {
   const [country, setCountry] = useState(null)
 
-  useEffect(() => {})
+  useEffect(() =>
+  {
+    if (name === '') return;
+    const addr = new URL(`https://restcountries.com/v3.1/name/${name}?fullText=true`)
+    axios.get(addr).then(response =>
+    {
+      console.log(response.data[0])
+      const received = response.data[0]
+      const countryObject = {
+        found: true, data: {
+          name: received.name.common,
+          capital: received.capital,
+          population: received.population,
+          flag: received.flags.svg
+        }
+      }
+      setCountry(countryObject)
+    })
+      .catch(error =>
+      {
+        // for (const key in error) {
+        //   if (Object.hasOwnProperty.call(error, key)) {
+        //     const element = error[key];
+        //     console.log(key,element)
+        //   }
+        // }
+        if (error.response.status === 404) {
+          const countryObject = { data: { name: name }, found: false }
+          setCountry(countryObject)
+        }
+        else
+          setCountry(null) // should not reach here
+      })
+  }, [name]) // useEffect
 
   return country
 }
