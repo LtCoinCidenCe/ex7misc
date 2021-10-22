@@ -79,7 +79,13 @@ const CreateNew = (props) => {
     })
     history.push('/') // do redirect
   }
-
+  
+  const resetForm = () => {
+    content.reset()
+    author.reset()
+    info.reset()
+  }
+  
   return (
     <div>
       <h2>create a new anecdote</h2>
@@ -97,6 +103,7 @@ const CreateNew = (props) => {
           <input name='info' {...info} />
         </div>
         <button type="submit">create</button>
+        <button type="button" onClick={resetForm}>reset</button>
       </form>
     </div>
   )
