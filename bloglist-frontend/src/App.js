@@ -4,7 +4,7 @@ import Blog from './components/Blog';
 import BlogForm from './components/BlogForm';
 import Notification from './components/Notification';
 import Togglable from './components/Togglable';
-import { createAction, initblogsAction } from './reducer/blogsReducer';
+import { createAction, deleteAction, initblogsAction, likeAction } from './reducer/blogsReducer';
 import { logininfoInit, setPasswordAction, setUsernameAction } from './reducer/logininfoReducer';
 import { setNotificationAction } from './reducer/notificationReducer';
 import { setTimerAction } from './reducer/timerReducer';
@@ -108,10 +108,8 @@ const App = () =>
 
     try
     {
-      // const data = await blogService.update(oldBlog.id, newblog);
-
-      // setBlogs(blogs.map(blog => blog.id !== oldBlog.id ? blog : data)
-      //   .sort((a, b) => b.likes - a.likes));
+      const data = await blogService.update(oldBlog.id, newblog);
+      dispatch(likeAction(data));
     }
     catch (exception)
     {
@@ -130,7 +128,7 @@ const App = () =>
       try
       {
         await blogService.remove(id);
-        // setBlogs(blogs.filter(blog => blog.id !== id)); // deleting does not require sorting
+        dispatch(deleteAction(id)); // deleting does not require sorting
 
         clearTimeout(mTime);
         dispatch(setNotificationAction(`s:Removed ${blog.title}`));
