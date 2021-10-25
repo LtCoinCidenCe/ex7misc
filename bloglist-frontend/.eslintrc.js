@@ -20,6 +20,7 @@ module.exports = {
     "react", "jest", "cypress"
   ],
   "rules": {
+    "no-unused-vars": ["warn"],
     "indent": [
       "warn",
       2,

@@ -4,6 +4,7 @@ import Blog from './components/Blog';
 import BlogForm from './components/BlogForm';
 import Notification from './components/Notification';
 import Togglable from './components/Togglable';
+import { createAction, initAction } from './reducer/blogsReducer';
 import { setNotificationAction } from './reducer/notificationReducer';
 import { setTimerAction } from './reducer/timerReducer';
 import blogService from './services/blogs';
@@ -14,8 +15,9 @@ const App = () =>
   const dispatch = useDispatch();
   const message = useSelector(state => state.notification);
   const mTime = useSelector(state => state.timer);
+  const blogs = useSelector(state => state.blogs);
 
-  const [blogs, setBlogs] = useState([]); // blog.title url author likes user{}
+  // const [blogs, setBlogs] = useState([]); // blog.title url author likes user{}
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -26,8 +28,8 @@ const App = () =>
   useEffect(() =>
   {
     // 5.9 add sort
-    blogService.getAll().then(blogs =>
-      setBlogs(blogs.sort((a, b) => b.likes - a.likes))
+    blogService.getAll().then(downloadedblogs =>
+      dispatch(initAction(downloadedblogs))
     );
   }, []);
 
@@ -66,8 +68,8 @@ const App = () =>
     }
     catch (exception)
     {
-      dispatch(setNotificationAction(`e:${exception.response.data.error}`));
       clearTimeout(mTime);
+      dispatch(setNotificationAction(`e:${exception.response.data.error}`));
       setTimerAction((setTimeout(() => { dispatch(setNotificationAction('')); }, 5000)));
     }
   };
@@ -81,17 +83,17 @@ const App = () =>
       // manually fix something
       response.user = userInformation;
 
-      setBlogs(blogs.concat(response).sort((a, b) => b.likes - a.likes)); // 5.9 add sort
+      dispatch(createAction(response)); // 5.9 add sort
       blogCreator.current.toggleVisibility();
-      dispatch(setNotificationAction(`s:a new blog "${response.title}" is added`));
       clearTimeout(mTime);
+      dispatch(setNotificationAction(`s:a new blog "${response.title}" is added`));
       dispatch(setTimerAction(setTimeout(() => { dispatch(setNotificationAction('')); }, 5000)));
     }
     catch (exception)
     {
       console.log('exception', exception.response);
-      dispatch(setNotificationAction(`e:${exception.response.data.error}`));
       clearTimeout(mTime);
+      dispatch(setNotificationAction(`e:${exception.response.data.error}`));
       dispatch(setTimerAction(setTimeout(() => { dispatch(setNotificationAction('')); }, 5000)));
     }
   };
@@ -107,18 +109,16 @@ const App = () =>
 
     try
     {
-      const data = await blogService.update(oldBlog.id, newblog);
-      setBlogs(blogs.map(blog => blog.id !== oldBlog.id ? blog : data)
-        .sort((a, b) => b.likes - a.likes)); // 5.9 add sort
-      // something wrong would happen if there is no such blog with that id because of backend is not handling
-      // there was no that exercise in part 4 about update around credential and exception
-      // but still any blog needs to be deleted from other client before it causes an error
+      // const data = await blogService.update(oldBlog.id, newblog);
+
+      // setBlogs(blogs.map(blog => blog.id !== oldBlog.id ? blog : data)
+      //   .sort((a, b) => b.likes - a.likes));
     }
     catch (exception)
     {
       console.log(exception);
-      dispatch(setNotificationAction(`e:${exception.response}`));
       clearTimeout(mTime);
+      dispatch(setNotificationAction(`e:${exception.response}`));
       dispatch(setTimerAction(setTimeout(() => { dispatch(setNotificationAction('')); }, 5000)));
     }
   };
@@ -131,16 +131,17 @@ const App = () =>
       try
       {
         await blogService.remove(id);
-        setBlogs(blogs.filter(blog => blog.id !== id)); // deleting does not require sorting
-        dispatch(setNotificationAction(`s:Removed ${blog.title}`));
+        // setBlogs(blogs.filter(blog => blog.id !== id)); // deleting does not require sorting
+
         clearTimeout(mTime);
+        dispatch(setNotificationAction(`s:Removed ${blog.title}`));
         dispatch(setTimerAction(setTimeout(() => { dispatch(setNotificationAction('')); }, 5000)));
       }
       catch (exception)
       {
         console.log(exception);
-        dispatch(setNotificationAction('e:error'));
         clearTimeout(mTime);
+        dispatch(setNotificationAction('e:error'));
         dispatch(setTimerAction(setTimeout(() => { dispatch(setNotificationAction('')); }, 5000)));
       }
     }

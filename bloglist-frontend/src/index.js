@@ -6,10 +6,12 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import App from './App';
 import notificationReducer from './reducer/notificationReducer';
 import timerReducer from './reducer/timerReducer';
+import blogsReducer from './reducer/blogsReducer';
 
-const combinedReducer=combineReducers({
-  notification:notificationReducer,
-  timer:timerReducer
+const combinedReducer = combineReducers({
+  notification: notificationReducer,
+  timer: timerReducer,
+  blogs: blogsReducer
 });
 
 const store = createStore(combinedReducer, composeWithDevTools());
