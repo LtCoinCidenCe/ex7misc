@@ -1,16 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import Blog from './components/Blog';
 import BlogForm from './components/BlogForm';
 import Notification from './components/Notification';
 import Togglable from './components/Togglable';
+import { setNotificationAction } from './reducer/notificationReducer';
+import { setTimerAction } from './reducer/timerReducer';
 import blogService from './services/blogs';
 import loginService from './services/login';
 
 const App = () =>
 {
+  const dispatch = useDispatch();
+  const message = useSelector(state => state.notification);
+  const mTime = useSelector(state => state.timer);
+
   const [blogs, setBlogs] = useState([]); // blog.title url author likes user{}
-  const [message, setMessage] = useState('');
-  const [mTime, setmTime] = useState(null);
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -61,9 +66,9 @@ const App = () =>
     }
     catch (exception)
     {
-      setMessage(`e:${exception.response.data.error}`);
+      dispatch(setNotificationAction(`e:${exception.response.data.error}`));
       clearTimeout(mTime);
-      setmTime(setTimeout(() => { setMessage(''); }, 5000));
+      setTimerAction((setTimeout(() => { dispatch(setNotificationAction('')); }, 5000)));
     }
   };
 
@@ -78,16 +83,16 @@ const App = () =>
 
       setBlogs(blogs.concat(response).sort((a, b) => b.likes - a.likes)); // 5.9 add sort
       blogCreator.current.toggleVisibility();
-      setMessage(`s:a new blog "${response.title}" is added`);
+      dispatch(setNotificationAction(`s:a new blog "${response.title}" is added`));
       clearTimeout(mTime);
-      setmTime(setTimeout(() => { setMessage(''); }, 5000));
+      dispatch(setTimerAction(setTimeout(() => { dispatch(setNotificationAction('')); }, 5000)));
     }
     catch (exception)
     {
       console.log('exception', exception.response);
-      setMessage(`e:${exception.response.data.error}`);
+      dispatch(setNotificationAction(`e:${exception.response.data.error}`));
       clearTimeout(mTime);
-      setmTime(setTimeout(() => { setMessage(''); }, 5000));
+      dispatch(setTimerAction(setTimeout(() => { dispatch(setNotificationAction('')); }, 5000)));
     }
   };
 
@@ -112,9 +117,9 @@ const App = () =>
     catch (exception)
     {
       console.log(exception);
-      setMessage(`e:${exception.response}`);
+      dispatch(setNotificationAction(`e:${exception.response}`));
       clearTimeout(mTime);
-      setmTime(setTimeout(() => { setMessage(''); }, 5000));
+      dispatch(setTimerAction(setTimeout(() => { dispatch(setNotificationAction('')); }, 5000)));
     }
   };
 
@@ -127,16 +132,16 @@ const App = () =>
       {
         await blogService.remove(id);
         setBlogs(blogs.filter(blog => blog.id !== id)); // deleting does not require sorting
-        setMessage(`s:Removed ${blog.title}`);
+        dispatch(setNotificationAction(`s:Removed ${blog.title}`));
         clearTimeout(mTime);
-        setmTime(setTimeout(() => { setMessage(''); }, 5000));
+        dispatch(setTimerAction(setTimeout(() => { dispatch(setNotificationAction('')); }, 5000)));
       }
       catch (exception)
       {
         console.log(exception);
-        setMessage('e:error');
+        dispatch(setNotificationAction('e:error'));
         clearTimeout(mTime);
-        setmTime(setTimeout(() => { setMessage(''); }, 5000));
+        dispatch(setTimerAction(setTimeout(() => { dispatch(setNotificationAction('')); }, 5000)));
       }
     }
   };
