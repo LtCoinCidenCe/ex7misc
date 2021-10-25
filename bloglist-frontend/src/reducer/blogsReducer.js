@@ -16,15 +16,15 @@ export const createAction = (blog) =>
   return {
     type: 'NEW',
     data: blog
-  }
-}
+  };
+};
 
-export const initAction = (data) =>
+export const initblogsAction = (data) =>
 {
   return {
     type: 'INIT',
     data: data
-  }
-}
+  };
+};
 
 export default blogsReducer;

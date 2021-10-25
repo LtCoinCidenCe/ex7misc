@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Blog from './components/Blog';
 import BlogForm from './components/BlogForm';
 import Notification from './components/Notification';
 import Togglable from './components/Togglable';
-import { createAction, initAction } from './reducer/blogsReducer';
+import { createAction, initblogsAction } from './reducer/blogsReducer';
+import { logininfoInit, setPasswordAction, setUsernameAction } from './reducer/logininfoReducer';
 import { setNotificationAction } from './reducer/notificationReducer';
 import { setTimerAction } from './reducer/timerReducer';
+import { clearUserAction, setUserAction } from './reducer/userReducer';
 import blogService from './services/blogs';
 import loginService from './services/login';
 
@@ -16,12 +18,10 @@ const App = () =>
   const message = useSelector(state => state.notification);
   const mTime = useSelector(state => state.timer);
   const blogs = useSelector(state => state.blogs);
-
-  // const [blogs, setBlogs] = useState([]); // blog.title url author likes user{}
-
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [user, setUser] = useState(null); // user.username user.name user.token
+  const { username, password } = useSelector(state => state.logininfo);
+  const user = useSelector(state => state.user);
+  // blog.title url author likes user{}
+  // user.username user.name user.token
 
   const blogCreator = useRef();
 
@@ -29,7 +29,7 @@ const App = () =>
   {
     // 5.9 add sort
     blogService.getAll().then(downloadedblogs =>
-      dispatch(initAction(downloadedblogs))
+      dispatch(initblogsAction(downloadedblogs))
     );
   }, []);
 
@@ -39,14 +39,14 @@ const App = () =>
     if (loggedUserJSON)
     {
       const u = JSON.parse(loggedUserJSON);
-      setUser(u);
+      dispatch(setUserAction(u));
       blogService.setToken(u.token);
     }
   }, []);
 
   const handleLogout = () =>
   {
-    setUser(null);
+    dispatch(clearUserAction());
     blogService.setToken(null);
     window.localStorage.removeItem('loggedUser');
   };
@@ -59,10 +59,9 @@ const App = () =>
     {
       console.log('logging in with: ', username, password);
       const kirjaudu = await loginService.login({ username, password });
-      setUser(kirjaudu);
+      dispatch(setUserAction(kirjaudu));
       blogService.setToken(kirjaudu.token);
-      setUsername('');
-      setPassword('');
+      dispatch(logininfoInit());
       // preserve token
       window.localStorage.setItem('loggedUser', JSON.stringify(kirjaudu));
     }
@@ -164,7 +163,7 @@ const App = () =>
               id="loginusername"
               value={username}
               name="Username"
-              onChange={(event) => setUsername(event.target.value)}
+              onChange={(event) => dispatch(setUsernameAction(event.target.value))}
             />
           </div>
           <div>password
@@ -172,7 +171,7 @@ const App = () =>
               id="loginpassword"
               value={password}
               name="Password"
-              onChange={(event) => setPassword(event.target.value)}
+              onChange={(event) => dispatch(setPasswordAction(event.target.value))}
             />
           </div>
           <button id="loginButton" type="submit">login</button>

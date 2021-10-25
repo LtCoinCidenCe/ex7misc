@@ -7,11 +7,17 @@ import App from './App';
 import notificationReducer from './reducer/notificationReducer';
 import timerReducer from './reducer/timerReducer';
 import blogsReducer from './reducer/blogsReducer';
+import logininfoReducer from './reducer/logininfoReducer';
+import userReducer from './reducer/userReducer';
+import blogFormReducer from './reducer/blogFormReducer';
 
 const combinedReducer = combineReducers({
   notification: notificationReducer,
   timer: timerReducer,
-  blogs: blogsReducer
+  blogs: blogsReducer,
+  logininfo: logininfoReducer,
+  user: userReducer,
+  blogform: blogFormReducer
 });
 
 const store = createStore(combinedReducer, composeWithDevTools());
