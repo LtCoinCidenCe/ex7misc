@@ -60,4 +60,21 @@ blogsRouter.put('/:id', async (request, response) =>
   response.json(returnedBlog);
 });
 
+blogsRouter.get('/:id/comments', async (request, response) =>
+{
+  const blog = await Blog.findById(request.params.id);
+  return response.json(blog.comments);
+})
+
+blogsRouter.post('/:id/comments', async (request, response) =>
+{
+  const body = request.body;
+  const originalBlog = await Blog.findById(request.params.id);
+  if (!originalBlog) return response.status(404).json({ error: 'blog not found' });
+  if (!originalBlog.comments) originalBlog.comments = [];
+  originalBlog.comments = originalBlog.comments.concat(body.comment);
+  await originalBlog.save();
+  return response.status(201).json(originalBlog);
+})
+
 module.exports = blogsRouter;

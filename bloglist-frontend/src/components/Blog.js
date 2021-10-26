@@ -7,6 +7,23 @@ const Blog = ({ blog, handleLike, handleRemove }) =>
   else
   {
     const displayRemove = () => handleRemove === null ? { display: 'none' } : null;
+    const commentsHelper = () =>
+    {
+      if (blog.comments.length === 0)
+        return <div style={{ color: 'grey' }}>no comments</div>;
+      else
+      {
+        const newArray = [];
+        for (let index = 0; index < blog.comments.length; index++)
+        {
+          const comment = blog.comments[index];
+          newArray.push({ index, comment });
+        }
+        return <ul>
+          {newArray.map(cmt => <li key={cmt.index}>{cmt.comment}</li>)}
+        </ul>;
+      }
+    };
     return (
       <div>
         <h2>{blog.title}</h2>
@@ -14,6 +31,8 @@ const Blog = ({ blog, handleLike, handleRemove }) =>
         <div className="blogLikes">likes {blog.likes}<button onClick={handleLike}>like</button></div>
         <div>added by {blog.user.name}</div>
         <div className="removeBlog" style={displayRemove()}><button onClick={handleRemove}>remove</button></div>
+        <h3>comments</h3>
+        {commentsHelper()}
       </div>);
   }
   // const [showDetail, setShowDetail] = useState(false);
