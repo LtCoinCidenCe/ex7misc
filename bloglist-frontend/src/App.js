@@ -1,5 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Route, Switch } from 'react-router';
 import Blog from './components/Blog';
 import BlogForm from './components/BlogForm';
 import Notification from './components/Notification';
@@ -11,6 +12,7 @@ import { setTimerAction } from './reducer/timerReducer';
 import { clearUserAction, setUserAction } from './reducer/userReducer';
 import blogService from './services/blogs';
 import loginService from './services/login';
+import userService from './services/users';
 
 const App = () =>
 {
@@ -23,6 +25,8 @@ const App = () =>
   // blog.title url author likes user{}
   // user.username user.name user.token
 
+  const [allUsers, setallUsers] = useState([]);
+
   const blogCreator = useRef();
 
   useEffect(() =>
@@ -31,6 +35,7 @@ const App = () =>
     blogService.getAll().then(downloadedblogs =>
       dispatch(initblogsAction(downloadedblogs))
     );
+    userService.getAll().then(users => setallUsers(users));
   }, []);
 
   useEffect(() =>
@@ -150,6 +155,36 @@ const App = () =>
     </Togglable>
   );
 
+  const etusivu = () => (
+    <div>
+      {blogForm()}
+      {blogs.map(blog =>
+        <Blog key={blog.id}
+          blog={blog}
+          handleLike={() => plusLike(blog.id)}
+          handleRemove={blog.user.username === user.username ? () => removeBlog(blog.id) : null}
+        />
+      )}
+    </div>
+  );
+
+  const kayttajiensivu = () =>
+  {
+    return (
+      <div>
+        <h2>Users</h2>
+        <table>
+          <tbody>
+            <tr><th> </th><th>blogs created</th></tr>
+            {allUsers.map(kayttaja => <tr key={kayttaja.username}>
+              <td>{kayttaja.name}</td><td>{kayttaja.blogs.length}</td>
+            </tr>)}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
   if (user === null)
     return (
       <div>
@@ -183,14 +218,14 @@ const App = () =>
         <Notification message={message} />
         <p><span>{user.name} logged in</span><button onClick={handleLogout}>logout</button></p>
 
-        {blogForm()}
-        {blogs.map(blog =>
-          <Blog key={blog.id}
-            blog={blog}
-            handleLike={() => plusLike(blog.id)}
-            handleRemove={blog.user.username === user.username ? () => removeBlog(blog.id) : null}
-          />
-        )}
+        <Switch>
+          <Route exact path="/">
+            {etusivu()}
+          </Route>
+          <Route path="/users">
+            {kayttajiensivu()}
+          </Route>
+        </Switch>
       </div>
     );
 };

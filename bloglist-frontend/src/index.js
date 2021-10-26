@@ -10,6 +10,7 @@ import blogsReducer from './reducer/blogsReducer';
 import logininfoReducer from './reducer/logininfoReducer';
 import userReducer from './reducer/userReducer';
 import blogFormReducer from './reducer/blogFormReducer';
+import { BrowserRouter } from 'react-router-dom';
 
 const combinedReducer = combineReducers({
   notification: notificationReducer,
@@ -24,6 +25,8 @@ const store = createStore(combinedReducer, composeWithDevTools());
 
 ReactDOM.render(
   <Provider store={store}>
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </Provider>,
   document.getElementById('root'));
