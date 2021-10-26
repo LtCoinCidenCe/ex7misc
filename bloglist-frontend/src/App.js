@@ -30,6 +30,9 @@ const App = () =>
   const userMatch = useRouteMatch('/users/:id');
   const userPage = userMatch ? allUsers.find(jsk => jsk.id === userMatch.params.id) : null;
 
+  const blogMatch = useRouteMatch('/blogs/:id');
+  const blogPage = blogMatch ? blogs.find(bjs => bjs.id === blogMatch.params.id) : null;
+
   const blogCreator = useRef();
 
   useEffect(() =>
@@ -162,11 +165,15 @@ const App = () =>
     <div>
       {blogForm()}
       {blogs.map(blog =>
-        <Blog key={blog.id}
-          blog={blog}
-          handleLike={() => plusLike(blog.id)}
-          handleRemove={blog.user.username === user.username ? () => removeBlog(blog.id) : null}
-        />
+        <div key={blog.id} style={
+          {
+            paddingTop: 10,
+            paddingLeft: 2,
+            border: 'solid',
+            borderWidth: 1,
+            marginBottom: 5
+          }
+        }><Link to={`/blogs/${blog.id}`}>{blog.title}</Link></div>
       )}
     </div>
   );
@@ -224,6 +231,11 @@ const App = () =>
         <Switch>
           <Route exact path="/">
             {etusivu()}
+          </Route>
+          <Route path="/blogs/:id">
+            <Blog blog={blogPage}
+              handleLike={() => plusLike(blogPage.id)}
+              handleRemove={() => removeBlog(blogPage.id)} />
           </Route>
           <Route path="/users/:id">
             <User user={userPage} />
