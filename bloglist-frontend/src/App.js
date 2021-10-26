@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Route, Switch, useRouteMatch, Link } from 'react-router-dom';
+import { Route, Switch, useRouteMatch, Link, useHistory } from 'react-router-dom';
 import Blog from './components/Blog';
 import BlogForm from './components/BlogForm';
 import Notification from './components/Notification';
@@ -17,6 +17,7 @@ import userService from './services/users';
 
 const App = () =>
 {
+  const history = useHistory();
   const dispatch = useDispatch();
   const message = useSelector(state => state.notification);
   const mTime = useSelector(state => state.timer);
@@ -195,6 +196,20 @@ const App = () =>
     );
   };
 
+  const removeChecker = () =>
+  {
+    if (blogPage)
+      return blogPage.user.username === user.username ?
+        () =>
+        {
+          removeBlog(blogPage.id);
+          history.push('/');
+        } :
+        null;
+    else
+      return null;
+  };
+
   if (user === null)
     return (
       <div>
@@ -224,9 +239,12 @@ const App = () =>
   else
     return (
       <div>
-        <h2>blogs</h2>
+        <div style={{ backgroundColor: 'lightgrey' }}>
+          <Link to='/'>blogs</Link> <Link to='/users'>users</Link> <span>
+            {user.name} logged in</span><button onClick={handleLogout}>logout</button>
+        </div>
+        <h2>blog app</h2>
         <Notification message={message} />
-        <p><span>{user.name} logged in</span><button onClick={handleLogout}>logout</button></p>
 
         <Switch>
           <Route exact path="/">
@@ -235,7 +253,7 @@ const App = () =>
           <Route path="/blogs/:id">
             <Blog blog={blogPage}
               handleLike={() => plusLike(blogPage.id)}
-              handleRemove={() => removeBlog(blogPage.id)} />
+              handleRemove={removeChecker()} />
           </Route>
           <Route path="/users/:id">
             <User user={userPage} />

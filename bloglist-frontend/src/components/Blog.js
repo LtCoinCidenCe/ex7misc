@@ -12,7 +12,7 @@ const Blog = ({ blog, handleLike, handleRemove }) =>
         <h2>{blog.title}</h2>
         <a href={blog.url}>{blog.url}</a>
         <div className="blogLikes">likes {blog.likes}<button onClick={handleLike}>like</button></div>
-        <div>added by {blog.author}</div>
+        <div>added by {blog.user.name}</div>
         <div className="removeBlog" style={displayRemove()}><button onClick={handleRemove}>remove</button></div>
       </div>);
   }
