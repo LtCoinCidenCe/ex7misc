@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Route, Switch } from 'react-router';
+import { Route, Switch, useRouteMatch, Link } from 'react-router-dom';
 import Blog from './components/Blog';
 import BlogForm from './components/BlogForm';
 import Notification from './components/Notification';
 import Togglable from './components/Togglable';
+import User from './components/User';
 import { createAction, deleteAction, initblogsAction, likeAction } from './reducer/blogsReducer';
 import { logininfoInit, setPasswordAction, setUsernameAction } from './reducer/logininfoReducer';
 import { setNotificationAction } from './reducer/notificationReducer';
@@ -26,6 +27,8 @@ const App = () =>
   // user.username user.name user.token
 
   const [allUsers, setallUsers] = useState([]);
+  const userMatch = useRouteMatch('/users/:id');
+  const userPage = userMatch ? allUsers.find(jsk => jsk.id === userMatch.params.id) : null;
 
   const blogCreator = useRef();
 
@@ -177,7 +180,7 @@ const App = () =>
           <tbody>
             <tr><th> </th><th>blogs created</th></tr>
             {allUsers.map(kayttaja => <tr key={kayttaja.username}>
-              <td>{kayttaja.name}</td><td>{kayttaja.blogs.length}</td>
+              <td><Link to={`/users/${kayttaja.id}`}>{kayttaja.name}</Link></td><td>{kayttaja.blogs.length}</td>
             </tr>)}
           </tbody>
         </table>
@@ -221,6 +224,9 @@ const App = () =>
         <Switch>
           <Route exact path="/">
             {etusivu()}
+          </Route>
+          <Route path="/users/:id">
+            <User user={userPage} />
           </Route>
           <Route path="/users">
             {kayttajiensivu()}

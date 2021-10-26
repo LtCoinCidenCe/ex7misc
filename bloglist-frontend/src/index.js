@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { combineReducers, createStore } from 'redux';
 import { Provider } from 'react-redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
+import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import notificationReducer from './reducer/notificationReducer';
 import timerReducer from './reducer/timerReducer';
@@ -10,7 +11,6 @@ import blogsReducer from './reducer/blogsReducer';
 import logininfoReducer from './reducer/logininfoReducer';
 import userReducer from './reducer/userReducer';
 import blogFormReducer from './reducer/blogFormReducer';
-import { BrowserRouter } from 'react-router-dom';
 
 const combinedReducer = combineReducers({
   notification: notificationReducer,
