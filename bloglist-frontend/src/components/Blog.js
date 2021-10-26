@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-const Blog = ({ blog, handleLike, handleRemove }) =>
+const Blog = ({ blog, handleLike, handleRemove, handleComment }) =>
 {
   if (!blog)
     return null;
@@ -32,27 +32,26 @@ const Blog = ({ blog, handleLike, handleRemove }) =>
         <div>added by {blog.user.name}</div>
         <div className="removeBlog" style={displayRemove()}><button onClick={handleRemove}>remove</button></div>
         <h3>comments</h3>
+        <CommentForm handleComment={handleComment} />
         {commentsHelper()}
       </div>);
   }
-  // const [showDetail, setShowDetail] = useState(false);
-  //
-  // if (showDetail === false)
-  //   return (
-  //     <div style={blogStyle}>
-  //       {blog.title} {blog.author} <button className="blogViewButton" onClick={() => setShowDetail(!showDetail)}>view</button>
-  //     </div>
-  //   );
-  // else
-  //   return (
-  //     <div style={blogStyle}>
-  //       <div>{blog.title}<button onClick={() => setShowDetail(!showDetail)}>hide</button></div>
-  //       <div>{blog.url}</div>
-  //       <div className="blogLikes">likes {blog.likes}<button onClick={handleLike}>like</button></div>
-  //       <div>{blog.author}</div>
-  //       <div className="removeBlog" style={displayRemove()}><button onClick={handleRemove}>remove</button></div>
-  //     </div>
-  //   );
+};
+
+const CommentForm = ({ handleComment }) =>
+{
+  const [comment, setComment] = useState('');
+  const handleSubmit = (event) =>
+  {
+    event.preventDefault();
+    handleComment(comment);
+    setComment('');
+  };
+
+  return <form onSubmit={handleSubmit}>
+    <input name='comment' value={comment} onChange={event => setComment(event.target.value)} />
+    <button type='submit'>create comment</button>
+  </form>;
 };
 
 export default Blog;

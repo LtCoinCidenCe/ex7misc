@@ -12,6 +12,7 @@ import { setNotificationAction } from './reducer/notificationReducer';
 import { setTimerAction } from './reducer/timerReducer';
 import { clearUserAction, setUserAction } from './reducer/userReducer';
 import blogService from './services/blogs';
+import commentService from './services/comment';
 import loginService from './services/login';
 import userService from './services/users';
 
@@ -24,7 +25,7 @@ const App = () =>
   const blogs = useSelector(state => state.blogs);
   const { username, password } = useSelector(state => state.logininfo);
   const user = useSelector(state => state.user);
-  // blog.title url author likes user{}
+  // blog.title url author likes user{} comments
   // user.username user.name user.token
 
   const [allUsers, setallUsers] = useState([]);
@@ -162,6 +163,12 @@ const App = () =>
     </Togglable>
   );
 
+  const handleComment = async (comment) => {
+    const newBlog = await commentService.postComment(blogPage.id,comment);
+    console.log(newBlog);
+    dispatch(likeAction({ ...blogPage,comments:newBlog.comments })); // borrowing likeaction for ease
+  };
+
   const etusivu = () => (
     <div>
       {blogForm()}
@@ -253,7 +260,8 @@ const App = () =>
           <Route path="/blogs/:id">
             <Blog blog={blogPage}
               handleLike={() => plusLike(blogPage.id)}
-              handleRemove={removeChecker()} />
+              handleRemove={removeChecker()}
+              handleComment={handleComment}/>
           </Route>
           <Route path="/users/:id">
             <User user={userPage} />
