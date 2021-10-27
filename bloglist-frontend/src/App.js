@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Form, Table, Button, ListGroup, ListGroupItem, Nav } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { Route, Switch, useRouteMatch, Link, useHistory } from 'react-router-dom';
 import Blog from './components/Blog';
@@ -105,7 +106,7 @@ const App = () =>
     {
       console.log('exception', exception.response);
       clearTimeout(mTime);
-      dispatch(setNotificationAction(`e:${exception.response.data.error}`));
+      dispatch(setNotificationAction(`e:${exception.response.status}`));
       dispatch(setTimerAction(setTimeout(() => { dispatch(setNotificationAction('')); }, 5000)));
     }
   };
@@ -163,27 +164,20 @@ const App = () =>
     </Togglable>
   );
 
-  const handleComment = async (comment) => {
-    const newBlog = await commentService.postComment(blogPage.id,comment);
+  const handleComment = async (comment) =>
+  {
+    const newBlog = await commentService.postComment(blogPage.id, comment);
     console.log(newBlog);
-    dispatch(likeAction({ ...blogPage,comments:newBlog.comments })); // borrowing likeaction for ease
+    dispatch(likeAction({ ...blogPage, comments: newBlog.comments })); // borrowing likeaction for ease
   };
 
   const etusivu = () => (
-    <div>
+    <ListGroup>
       {blogForm()}
       {blogs.map(blog =>
-        <div key={blog.id} style={
-          {
-            paddingTop: 10,
-            paddingLeft: 2,
-            border: 'solid',
-            borderWidth: 1,
-            marginBottom: 5
-          }
-        }><Link to={`/blogs/${blog.id}`}>{blog.title}</Link></div>
+        <ListGroupItem key={blog.id}><Link to={`/blogs/${blog.id}`}>{blog.title}</Link></ListGroupItem>
       )}
-    </div>
+    </ListGroup>
   );
 
   const kayttajiensivu = () =>
@@ -191,14 +185,14 @@ const App = () =>
     return (
       <div>
         <h2>Users</h2>
-        <table>
+        <Table striped>
           <tbody>
             <tr><th> </th><th>blogs created</th></tr>
             {allUsers.map(kayttaja => <tr key={kayttaja.username}>
               <td><Link to={`/users/${kayttaja.id}`}>{kayttaja.name}</Link></td><td>{kayttaja.blogs.length}</td>
             </tr>)}
           </tbody>
-        </table>
+        </Table>
       </div>
     );
   };
@@ -222,35 +216,51 @@ const App = () =>
       <div>
         <h2>Log in to application</h2>
         <Notification message={message} />
-        <form onSubmit={handleLogin}>
-          <div>username
-            <input type="text"
-              id="loginusername"
-              value={username}
-              name="Username"
-              onChange={(event) => dispatch(setUsernameAction(event.target.value))}
-            />
-          </div>
-          <div>password
-            <input type="text"
-              id="loginpassword"
-              value={password}
-              name="Password"
-              onChange={(event) => dispatch(setPasswordAction(event.target.value))}
-            />
-          </div>
-          <button id="loginButton" type="submit">login</button>
-        </form>
+        <Form onSubmit={handleLogin}>
+          <Form.Group>
+            <div>
+              <Form.Label>username
+                <Form.Control type="text"
+                  id="loginusername"
+                  value={username}
+                  name="Username"
+                  onChange={(event) => dispatch(setUsernameAction(event.target.value))}
+                />
+              </Form.Label>
+            </div>
+            <div>
+              <Form.Label>password
+                <Form.Control type="password"
+                  id="loginpassword"
+                  value={password}
+                  name="Password"
+                  onChange={(event) => dispatch(setPasswordAction(event.target.value))}
+                />
+              </Form.Label>
+            </div>
+            <Button id="loginButton" type="submit">login</Button>
+          </Form.Group>
+        </Form>
       </div>
     );
   else
     return (
       <div>
-        <div style={{ backgroundColor: 'lightgrey' }}>
-          <Link to='/'>blogs</Link> <Link to='/users'>users</Link> <span>
-            {user.name} logged in</span><button onClick={handleLogout}>logout</button>
-        </div>
-        <h2>blog app</h2>
+        <Nav>
+          <Nav.Item>
+            <Link className='nav-link' to='/'>Blogs</Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Link className='nav-link' to='/users'>Users</Link>
+          </Nav.Item>
+          <Nav.Item>
+            <span className='nav-link'>{user.name} logged in</span>
+          </Nav.Item>
+          <Nav.Item>
+            <Link className='nav-link' to='/' onClick={handleLogout}>logout</Link>
+          </Nav.Item>
+        </Nav>
+        <h2 className="display-4">Blog App</h2>
         <Notification message={message} />
 
         <Switch>
@@ -261,7 +271,7 @@ const App = () =>
             <Blog blog={blogPage}
               handleLike={() => plusLike(blogPage.id)}
               handleRemove={removeChecker()}
-              handleComment={handleComment}/>
+              handleComment={handleComment} />
           </Route>
           <Route path="/users/:id">
             <User user={userPage} />

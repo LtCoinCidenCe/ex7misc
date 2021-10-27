@@ -1,14 +1,15 @@
 import React from 'react';
 import './Notification.css';
+import { Alert } from 'react-bootstrap';
 
 const Notification = ({ message }) =>
 {
   if (message !== null)
   {
     if (message.startsWith('e:')) // error
-      return <div className='error info'>{message.slice(2)}</div>;
+      return <Alert variant='danger'>{message.slice(2)}</Alert>;
     if (message.startsWith('s:')) // success
-      return <div className='success info'>{message.slice(2)}</div>;
+      return <Alert variant='success'>{message.slice(2)}</Alert>;
   }
   return null;
 };

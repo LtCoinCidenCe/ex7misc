@@ -26,7 +26,9 @@ const store = createStore(combinedReducer, composeWithDevTools());
 ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter>
-      <App />
+      <div className='container'>
+        <App />
+      </div>
     </BrowserRouter>
   </Provider>,
   document.getElementById('root'));
